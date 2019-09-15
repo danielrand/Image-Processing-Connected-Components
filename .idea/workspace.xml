@@ -3,6 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="dc4559d1-d83c-4098-9c1c-c31063319ffe" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/CV_Project_3_8Connected_Components/ConnectedComponents.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/CV_Project_3_8Connected_Components/ConnectedComponents.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/CV_Project_3_8Connected_Components/Property.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/CV_Project_3_8Connected_Components/Property.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ConnectedComponents.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ConnectedComponents.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -17,6 +20,7 @@
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
