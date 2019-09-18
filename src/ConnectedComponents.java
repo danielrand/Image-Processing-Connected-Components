@@ -10,7 +10,7 @@ import java.util.Scanner;
 public class ConnectedComponents {
 
 	int numRows, numCols, minVal, maxVal, newMin, newMax, newLabel, numNb;
-	int minLabel;
+	int minLabel, maxLabel;
 	int [] [] zeroFramedAry;
 	ArrayList<Integer> nonZeroNeighbor;
 	int [] EQAry;
@@ -81,10 +81,10 @@ public class ConnectedComponents {
 
 	public void printEQAry (PrintWriter outFile) {
 		outFile.print("\n\nEQARY:\nIndex: ");
-		for (int i = 0; i <= newLabel; i++)
+		for (int i = 0; i < newLabel; i++)
 			outFile.print(i +  " ");
 		outFile.print("\nLabel: ");
-		for (int i = 0; i <= newLabel; i++)
+		for (int i = 0; i < newLabel; i++)
 			outFile.print(EQAry[i] +  ((i > 9 && EQAry[i] <= 9) ? "  " : " "));
 		outFile.println();
 	}
@@ -147,26 +147,60 @@ public class ConnectedComponents {
 
 	public void manageEQAry () {
 		int label = 1;
-		for (int i = 1; i <= newLabel; i++) {
+		for (int i = 1; i < newLabel; i++) {
 			if (i == EQAry[i]) {
 				EQAry[i] = label;
 				label++;
 			}
 			else EQAry[i] = EQAry[EQAry[i]];
 		}
+		maxLabel = --label;
+		System.out.println("Max l: " + maxLabel);
 	}
 
 	public void pass3 () {
 		newMin = 999;
 		newMax = 0;
+		CCProperty = new Property[maxLabel+1];
 		for (int i = 1; i <= numRows; i++) {
 			for (int j = 1; j <= numCols; j++) {
-				zeroFramedAry[i][j] = EQAry[zeroFramedAry[i][j]];
-				if (zeroFramedAry[i][j] < newMin)
-					newMin = zeroFramedAry[i][j];
-				else if (zeroFramedAry[i][j] > newMax)
-					newMax = zeroFramedAry[i][j];
+				int currentPixel = zeroFramedAry[i][j] = EQAry[zeroFramedAry[i][j]];
+				if (currentPixel < newMin)
+					newMin = currentPixel;
+				else if (currentPixel > newMax)
+					newMax = currentPixel;
+				if (currentPixel > 0) {
+					if (CCProperty[currentPixel] == null)
+						CCProperty[currentPixel] = new Property(currentPixel, 1, i, j, i, j);
+					else {
+						Property currentProperty = CCProperty[currentPixel];
+						currentProperty.numPixels++;
+						if (i < currentProperty.minRow) currentProperty.minRow = i;
+						else if (i > currentProperty.maxRow) currentProperty.maxRow = i;
+						if (j < currentProperty.minCol) currentProperty.minCol = j;
+						else if (j > currentProperty.maxCol) currentProperty.maxCol = j;
+					}
+				}
 			}
+		}
+
+		for (int i = 1; i < CCProperty.length; i++) {
+			Property current = CCProperty[i];
+			current.minRow -= 1;
+			current.minCol -= 1;
+			current.maxRow -= 1;
+			current.maxCol -= 1;
+			System.out.println ("Property " + i + ": " + current.label + ", " + current.numPixels + ", " + current.minRow + ", " + current.minCol + ", " + current.maxRow + ", " + current.maxCol);
+		}
+
+	}
+
+	public void printFinalState (PrintWriter outFile) {
+		outFile.println(numRows + " " + numCols + " " + newMin + " " + newMax);
+		for (int i = 1; i <= numRows; i++) {
+			for (int j = 1; j <= numCols; j++)
+				outFile.print(zeroFramedAry[i][j] + " ");
+			outFile.println();
 		}
 	}
 
@@ -189,7 +223,7 @@ public class ConnectedComponents {
 			CC.printEQAry(outFile1);
 			CC.pass3();
 			CC.prettyPrint(outFile1,3);
-
+			CC.printFinalState(outFile2);
 		} catch (FileNotFoundException e) {
 			System.out.println("One or more input files not found.");
 		} catch (IOException e) {
@@ -200,9 +234,20 @@ public class ConnectedComponents {
 }
 
 class Property {
+
 	int label, numPixels, minRow, minCol, maxRow, maxCol;
 
-	public Property () {
+    public Property(int label, int numPixels, int minRow, int minCol, int maxRow, int maxCol) {
+        this.label = label;
+        this.numPixels = numPixels;
+        this.minRow = minRow;
+        this.minCol = minCol;
+        this.maxRow = maxRow;
+        this.maxCol = maxCol;
+    }
+
+    public Property () {
 		label = numPixels = minRow = minCol = maxRow = maxCol = 0;
 	}
+
 }
