@@ -183,16 +183,13 @@ public class ConnectedComponents {
 				}
 			}
 		}
-
 		for (int i = 1; i < CCProperty.length; i++) {
 			Property current = CCProperty[i];
 			current.minRow -= 1;
 			current.minCol -= 1;
 			current.maxRow -= 1;
 			current.maxCol -= 1;
-			System.out.println ("Property " + i + ": " + current.label + ", " + current.numPixels + ", " + current.minRow + ", " + current.minCol + ", " + current.maxRow + ", " + current.maxCol);
 		}
-
 	}
 
 	public void printFinalState (PrintWriter outFile) {
@@ -203,6 +200,17 @@ public class ConnectedComponents {
 			outFile.println();
 		}
 	}
+
+	public void printCCProperty (PrintWriter outFile) {
+        for (int i = 1; i < CCProperty.length; i++) {
+            Property current = CCProperty[i];
+            outFile.println("Property " + i + ":\n\tLabel: "
+                    + current.label + "\n\tNumber of Pixels: " + current.numPixels
+                    + "\n\tMin Row: " + current.minRow + "\n\tMin Col:"
+                    + current.minCol + "\n\tMax Row: " + current.maxRow
+                    + "\n\tMax Col: " + current.maxCol);
+        }
+    }
 
 	public static void main(String[] args) {
 		if (args.length != 4) {
@@ -224,6 +232,7 @@ public class ConnectedComponents {
 			CC.pass3();
 			CC.prettyPrint(outFile1,3);
 			CC.printFinalState(outFile2);
+			CC.printCCProperty(outFile3);
 		} catch (FileNotFoundException e) {
 			System.out.println("One or more input files not found.");
 		} catch (IOException e) {
@@ -245,9 +254,5 @@ class Property {
         this.maxRow = maxRow;
         this.maxCol = maxCol;
     }
-
-    public Property () {
-		label = numPixels = minRow = minCol = maxRow = maxCol = 0;
-	}
 
 }
