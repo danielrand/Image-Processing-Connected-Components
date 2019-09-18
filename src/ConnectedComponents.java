@@ -34,14 +34,6 @@ public class ConnectedComponents {
 				zeroFramedAry[i+1][j+1] = inFile.nextInt();
 	}
 
-	private void printAry () {
-		for (int i = 0; i < numRows+2; i++) {
-			for (int j = 0; j < numCols+2; j++) {
-				System.out.print(zeroFramedAry[i][j] + " ");
-			} System.out.println();
-		}
-	}
-
 	public void prettyPrint (PrintWriter outFile, int passNum) {
 		outFile.println("----------------------------------------------------------------------------------------");
 		outFile.println("PASS " + passNum + ":\n");
@@ -76,7 +68,6 @@ public class ConnectedComponents {
 				}
 			}
 		}
-		printAry();
 	}
 
 	public void printEQAry (PrintWriter outFile) {
@@ -99,8 +90,6 @@ public class ConnectedComponents {
 	}
 
 	public int loadNonZero (int whichPass, int i, int j) {
-		if (zeroFramedAry[i][j] == 12)
-			System.out.println();
 		nonZeroNeighbor = new ArrayList<>();
 		if (whichPass == 1) {
 			for (int row = i - 1; row <= i; row++) {
@@ -134,7 +123,7 @@ public class ConnectedComponents {
 			for (int j = numCols; j > 0; j--) {
 				if (zeroFramedAry[i][j] > 0) {
 					minLabel = 999;
-					numNb = loadNonZero (2, i, j);
+					numNb = loadNonZero(2, i, j);
 					if (numNb > 1) {
 						zeroFramedAry[i][j] = minLabel;
 						updateEQ();
@@ -142,7 +131,6 @@ public class ConnectedComponents {
 				}
 			}
 		}
-		printAry();
 	}
 
 	public void manageEQAry () {
@@ -155,7 +143,6 @@ public class ConnectedComponents {
 			else EQAry[i] = EQAry[EQAry[i]];
 		}
 		maxLabel = --label;
-		System.out.println("Max l: " + maxLabel);
 	}
 
 	public void pass3 () {
