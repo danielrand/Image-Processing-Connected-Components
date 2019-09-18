@@ -4,13 +4,15 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class ConnectedComponents {
 
 	int numRows, numCols, minVal, maxVal, newMin, newMax, newLabel, numNb;
+	int minLabel;
 	int [] [] zeroFramedAry;
-	int [] nonZeroNeighbor;
+	ArrayList<Integer> nonZeroNeighbor;
 	int [] EQAry;
 	Property [] CCProperty;
 
@@ -19,6 +21,9 @@ public class ConnectedComponents {
 		numCols = inFile.nextInt();
 		minVal = inFile.nextInt();
 		maxVal = inFile.nextInt();
+		EQAry = new int [numRows*numCols];
+		for (int i = 0; i < EQAry.length; i++)
+			EQAry[i] = i;
 		zeroFramedAry = new int[numRows+2][numCols+2];
 		frameAry(inFile);
 	}
@@ -27,11 +32,28 @@ public class ConnectedComponents {
 		for (int i = 0; i < numRows; i++)
 			for (int j = 0; j < numCols; j++)
 				zeroFramedAry[i+1][j+1] = inFile.nextInt();
-		/*for (int i = 0; i < numRows+2; i++) {
+	}
+
+	private void printAry () {
+		for (int i = 0; i < numRows+2; i++) {
 			for (int j = 0; j < numCols+2; j++) {
 				System.out.print(zeroFramedAry[i][j] + " ");
 			} System.out.println();
-		}*/
+		}
+	}
+
+	public void prettyPrint (PrintWriter outFile, int passNum) {
+		outFile.println("----------------------------------------------------------------------------------------");
+		outFile.println("PASS " + passNum + ":\n");
+		for (int i = 1; i <= numRows; i++) {
+			for (int j = 1; j <= numCols; j++) {
+				if (zeroFramedAry[i][j] > 0)
+					outFile.print(zeroFramedAry[i][j] + ((zeroFramedAry[i][j] < 10) ? "  " : " "));
+				else outFile.print("   ");
+			} outFile.println("\n");
+		}
+		printEQAry(outFile);
+		outFile.println("----------------------------------------------------------------------------------------");
 	}
 
 	public void pass1 () {
@@ -39,22 +61,113 @@ public class ConnectedComponents {
 		for (int i = 1; i <= numRows; i++) {
 			for (int j = 1; j <= numCols; j++) {
 				if (zeroFramedAry[i][j] > 0) {
-					numNb = loadNonZero (1, i, 0, min, min)
+					minLabel = 999;
+					numNb = loadNonZero (1, i, j);
+					if (numNb == 0) {
+						zeroFramedAry[i][j] = newLabel;
+						newLabel++;
+					}
+					else if (numNb == 1)
+						zeroFramedAry [i][j] = minLabel;
+					else if (numNb > 1) {
+						zeroFramedAry[i][j] = minLabel;
+						updateEQ();
+					}
 				}
 			}
 		}
+		printAry();
+	}
+
+	public void printEQAry (PrintWriter outFile) {
+		outFile.print("\n\nEQARY:\nIndex: ");
+		for (int i = 0; i <= newLabel; i++)
+			outFile.print(i +  " ");
+		outFile.print("\nLabel: ");
+		for (int i = 0; i <= newLabel; i++)
+			outFile.print(EQAry[i] +  ((i > 9 && EQAry[i] <= 9) ? "  " : " "));
+		outFile.println();
+	}
+
+	private void processPixel (int row, int col) {
+		int currentPixel = zeroFramedAry[row][col];
+		if (currentPixel > 0 && !nonZeroNeighbor.contains(currentPixel)) {
+			nonZeroNeighbor.add(currentPixel);
+			if (currentPixel < minLabel)
+				minLabel = currentPixel;
+		}
+	}
+
+	public int loadNonZero (int whichPass, int i, int j) {
+		if (zeroFramedAry[i][j] == 12)
+			System.out.println();
+		nonZeroNeighbor = new ArrayList<>();
+		if (whichPass == 1) {
+			for (int row = i - 1; row <= i; row++) {
+				for (int col = j - 1; col <= j + 1; col++) {
+					if (row == i && col == j) break;
+					processPixel(row,col);
+				}
+			}
+		}
+		else {
+			for (int row = i + 1; row >= i; row--) {
+				for (int col = j + 1; col >= j - 1; col--) {
+					processPixel(row,col);
+					if (row == i && col == j) break;
+				}
+			}
+		}
+		int numDiffLabels = nonZeroNeighbor.size();
+		if (numDiffLabels == 0)
+			minLabel = 0;
+		return numDiffLabels;
+	}
+
+	private void updateEQ () {
+		for (int i = 0; i < nonZeroNeighbor.size(); i++)
+			EQAry[nonZeroNeighbor.get(i)] = minLabel;
 	}
 
 	public void pass2 () {
-
+		for (int i = numRows; i > 0; i--) {
+			for (int j = numCols; j > 0; j--) {
+				if (zeroFramedAry[i][j] > 0) {
+					minLabel = 999;
+					numNb = loadNonZero (2, i, j);
+					if (numNb > 1) {
+						zeroFramedAry[i][j] = minLabel;
+						updateEQ();
+					}
+				}
+			}
+		}
+		printAry();
 	}
 
 	public void manageEQAry () {
-
+		int label = 1;
+		for (int i = 1; i <= newLabel; i++) {
+			if (i == EQAry[i]) {
+				EQAry[i] = label;
+				label++;
+			}
+			else EQAry[i] = EQAry[EQAry[i]];
+		}
 	}
 
 	public void pass3 () {
-
+		newMin = 999;
+		newMax = 0;
+		for (int i = 1; i <= numRows; i++) {
+			for (int j = 1; j <= numCols; j++) {
+				zeroFramedAry[i][j] = EQAry[zeroFramedAry[i][j]];
+				if (zeroFramedAry[i][j] < newMin)
+					newMin = zeroFramedAry[i][j];
+				else if (zeroFramedAry[i][j] > newMax)
+					newMax = zeroFramedAry[i][j];
+			}
+		}
 	}
 
 	public static void main(String[] args) {
@@ -69,9 +182,13 @@ public class ConnectedComponents {
 			PrintWriter outFile3 = new PrintWriter(new BufferedWriter(new FileWriter(args[3])), true);
 			ConnectedComponents CC = new ConnectedComponents(inFile);
 			CC.pass1();
+			CC.prettyPrint(outFile1,1);
 			CC.pass2();
+			CC.prettyPrint(outFile1,2);
 			CC.manageEQAry();
+			CC.printEQAry(outFile1);
 			CC.pass3();
+			CC.prettyPrint(outFile1,3);
 
 		} catch (FileNotFoundException e) {
 			System.out.println("One or more input files not found.");
@@ -81,6 +198,7 @@ public class ConnectedComponents {
 
 	}
 }
+
 class Property {
 	int label, numPixels, minRow, minCol, maxRow, maxCol;
 
